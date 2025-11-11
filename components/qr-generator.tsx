@@ -64,9 +64,10 @@ export function QRGenerator() {
 
   if (!address) return null
 
+  // EIP-681 format for better wallet compatibility
   const qrValue = amount 
-    ? `${address}?amount=${amount}${note ? `&message=${encodeURIComponent(note)}` : ''}`
-    : address
+    ? `ethereum:${address}@${chainId}?value=${parseFloat(amount) * 1e18}${note ? `&message=${encodeURIComponent(note)}` : ''}`
+    : `ethereum:${address}`
 
   return (
     <div className="bg-white rounded-2xl p-6 shadow-sm">
