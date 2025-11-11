@@ -138,7 +138,7 @@ export function TransferRequests() {
                   <p className="font-mono text-xs text-gray-600 break-all">{request.to_address}</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-lg font-semibold text-gray-900">{request.amount} BNB</p>
+                  <p className="text-lg font-semibold text-gray-900">{request.amount}</p>
                   <p className="text-xs text-gray-500">
                     {new Date(request.created_at).toLocaleDateString()}
                   </p>

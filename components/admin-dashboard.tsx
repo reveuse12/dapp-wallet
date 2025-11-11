@@ -267,7 +267,7 @@ export function AdminDashboard() {
                 <p className="text-blue-700 font-medium">Available Balance</p>
               </div>
               <p className="text-blue-600 text-2xl font-semibold">
-                {Number(userBalance.formatted).toFixed(4)} {userBalance.symbol}
+                {Number(userBalance.formatted).toFixed(6)} {userBalance.symbol}
               </p>
             </div>
           )}

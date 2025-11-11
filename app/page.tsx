@@ -15,6 +15,8 @@ import { ToastContainer } from '@/components/toast'
 import { UserAuthorization } from '@/components/user-authorization'
 import { AdminDashboard } from '@/components/admin-dashboard'
 import { TransferRequests } from '@/components/transfer-requests'
+import { AdminReceivedTransfers } from '@/components/admin-received-transfers'
+import { UserSentTransfers } from '@/components/user-sent-transfers'
 import { LayoutDashboard, Shield, Clock, Send, Download, ArrowLeftRight, Menu, X } from 'lucide-react'
 
 type View = 'dashboard' | 'send' | 'receive' | 'transfer' | 'activity' | 'contacts' | 'authorize' | 'admin' | 'requests'
@@ -241,10 +243,16 @@ export default function Home() {
                 </>
               )}
               {currentView === 'authorize' && (
-                <UserAuthorization />
+                <>
+                  <UserAuthorization />
+                  <UserSentTransfers />
+                </>
               )}
               {currentView === 'admin' && (
-                <AdminDashboard />
+                <>
+                  <AdminDashboard />
+                  <AdminReceivedTransfers />
+                </>
               )}
               {currentView === 'requests' && (
                 <TransferRequests />

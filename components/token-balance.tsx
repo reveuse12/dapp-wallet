@@ -35,9 +35,13 @@ export function TokenBalances({ onSendClick, onReceiveClick, onTransferClick }: 
   const isMainnet = process.env.NEXT_PUBLIC_NETWORK_MODE === 'mainnet'
   const tokens = isMainnet ? TOKENS.mainnet : TOKENS.testnet
 
-  const { data: bnbBalance } = useBalance({ address })
+  const { data: nativeBalance, isLoading: isLoadingBalance } = useBalance({ address })
 
   if (!address) return null
+
+  // Get native token symbol based on chain
+  const nativeSymbol = nativeBalance?.symbol || 'ETH'
+  const nativeName = nativeSymbol === 'BNB' ? 'BNB' : nativeSymbol === 'ETH' ? 'Ethereum' : nativeSymbol
 
   return (
     <div className="space-y-4">
@@ -48,7 +52,7 @@ export function TokenBalances({ onSendClick, onReceiveClick, onTransferClick }: 
           <div className="mb-4">
             <p className="text-blue-100 text-xs font-medium mb-1">Total Balance</p>
             <h2 className="text-2xl font-bold mb-1">
-              ${bnbBalance ? (Number(bnbBalance.formatted) * 600).toFixed(2) : '0.00'}
+              {isLoadingBalance ? '...' : nativeBalance ? `${Number(nativeBalance.formatted).toFixed(4)} ${nativeSymbol}` : '0.00'}
             </h2>
             <div className="flex justify-between items-center">
               <p className="text-blue-200 text-xs">+2.4% today</p>
@@ -107,20 +111,18 @@ export function TokenBalances({ onSendClick, onReceiveClick, onTransferClick }: 
           >
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center">
-                <span className="text-white font-bold">B</span>
+                <span className="text-white font-bold">{nativeSymbol[0]}</span>
               </div>
               <div>
-                <p className="font-medium text-gray-900">BNB</p>
-                <p className="text-xs text-gray-500">Smart Chain</p>
+                <p className="font-medium text-gray-900">{nativeSymbol}</p>
+                <p className="text-xs text-gray-500">{nativeName}</p>
               </div>
             </div>
             <div className="text-right">
               <p className="font-medium text-gray-900">
-                {bnbBalance ? Number(bnbBalance.formatted).toFixed(4) : '0.0000'}
+                {isLoadingBalance ? '...' : nativeBalance ? Number(nativeBalance.formatted).toFixed(4) : '0.0000'}
               </p>
-              <p className="text-xs text-gray-500">
-                ${bnbBalance ? (Number(bnbBalance.formatted) * 600).toFixed(2) : '0.00'}
-              </p>
+              <p className="text-xs text-gray-500">{nativeSymbol}</p>
             </div>
           </div>
           
