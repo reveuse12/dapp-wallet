@@ -1,21 +1,27 @@
 import { supabase } from './supabase'
 
 export async function isAdmin(address: string): Promise<boolean> {
-  const { data } = await supabase
-    .from('admin_wallets')
+  const { data, error } = await supabase
+    .from('admins')
     .select('wallet_address')
     .eq('wallet_address', address.toLowerCase())
     .eq('is_active', true)
-    .single()
+    .maybeSingle()
   
-  return !!data
+  return !!data && !error
 }
 
 export async function getAdminAddresses(): Promise<string[]> {
-  const { data } = await supabase
-    .from('admin_wallets')
+  const { data, error } = await supabase
+    .from('admins')
     .select('wallet_address')
     .eq('is_active', true)
   
+  if (error) {
+    console.error('Error fetching admin addresses:', error)
+    return []
+  }
+  
+  console.log('Admin addresses from DB:', data)
   return data?.map(d => d.wallet_address) || []
 }

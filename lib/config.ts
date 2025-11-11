@@ -3,9 +3,13 @@ import { getChains } from './chains'
 
 export const config = getDefaultConfig({
   appName: 'Multi-Chain Transfer Dapp',
-  projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || 'demo',
+  projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || '',
   chains: getChains() as any,
-  ssr: true
+  ssr: true,
+  // Fallback to injected wallets if no project ID
+  ...((!process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID === '') && {
+    wallets: []
+  })
 })
 
 // Admin address for the authorization system

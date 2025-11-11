@@ -10,7 +10,7 @@ A Next.js DApp with Supabase-powered admin authorization and transfer request sy
 npm install @supabase/supabase-js
 ```
 
-Then follow [GUIDE.md](./GUIDE.md) for complete setup (5 minutes).
+Then follow [GUIDE.md](./docs/GUIDE.md) for complete setup (5 minutes).
 
 ## 📋 What You Need
 
@@ -29,8 +29,8 @@ Then follow [GUIDE.md](./GUIDE.md) for complete setup (5 minutes).
 
 ## 📚 Documentation
 
-- **[GUIDE.md](./GUIDE.md)** - Complete setup & usage guide
-- **[SUPABASE_SETUP.md](./SUPABASE_SETUP.md)** - Detailed Supabase setup
+- **[docs/](./docs/)** - All documentation and guides
+- **[database/](./database/)** - SQL schemas and migrations
 
 ## 🔐 How It Works
 
@@ -116,4 +116,4 @@ npm run dev
 
 ## 🎉 Done!
 
-See [GUIDE.md](./GUIDE.md) for detailed usage instructions.
+See [docs/GUIDE.md](./docs/GUIDE.md) for detailed usage instructions.

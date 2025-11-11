@@ -51,10 +51,29 @@ export function AdminDashboard() {
     if (!address) return
     setIsLoadingUsers(true)
     try {
+      // Get admin record
+      const { data: admin } = await supabase
+        .from('admins')
+        .select('id')
+        .eq('wallet_address', address.toLowerCase())
+        .maybeSingle()
+      
+      if (!admin) {
+        console.error('Admin not found')
+        setAuthorizedUsers([])
+        return
+      }
+
+      // Get authorized users
       const { data, error } = await supabase
         .from('authorizations')
-        .select('user_address')
-        .eq('admin_address', address.toLowerCase())
+        .select(`
+          user_address,
+          users!inner (
+            wallet_address
+          )
+        `)
+        .eq('admin_id', admin.id)
         .eq('authorized', true)
       
       if (error) throw error
@@ -89,19 +108,33 @@ export function AdminDashboard() {
         return
       }
       
-      // IMPORTANT: This creates a transfer request
-      // The USER (selectedUser) must approve this transaction in their wallet
-      // Admin cannot transfer without user's signature
+      // Get user and admin IDs
+      const { data: fromUser } = await supabase
+        .from('users')
+        .select('id')
+        .eq('wallet_address', selectedUser.toLowerCase())
+        .maybeSingle()
       
+      const { data: toAdmin } = await supabase
+        .from('admins')
+        .select('id')
+        .eq('wallet_address', address.toLowerCase())
+        .maybeSingle()
+      
+      if (!fromUser || !toAdmin) {
+        throw new Error('User or admin not found')
+      }
+
       // Store transfer request in Supabase
       const { error: requestError } = await supabase
         .from('transfer_requests')
         .insert({
+          from_user_id: fromUser.id,
+          to_admin_id: toAdmin.id,
           from_address: selectedUser.toLowerCase(),
           to_address: address.toLowerCase(),
           amount: amount,
-          status: 'pending',
-          created_at: new Date().toISOString()
+          status: 'pending'
         })
       
       if (requestError) throw requestError

@@ -13,3 +13,20 @@ export interface Authorization {
   created_at?: string
   updated_at?: string
 }
+
+export interface AddressBookEntry {
+  id?: number
+  user_address: string
+  contact_name: string
+  contact_address: string
+  created_at?: string
+}
+
+export interface TransferHistoryEntry {
+  id?: number
+  user_address: string
+  tx_hash: string
+  amount: string
+  status: 'pending' | 'success' | 'failed'
+  created_at?: string
+}

@@ -3,7 +3,7 @@
 import { useAccount } from 'wagmi'
 import { useState, useEffect } from 'react'
 import { showToast } from './toast'
-import { supabase } from '@/lib/supabase'
+import { authorizeAdmin, revokeAdminAuthorization, isAdminAuthorized } from '@/lib/services/authorization.service'
 import { getAdminAddresses } from '@/lib/admin'
 import { Shield, CheckCircle, AlertCircle, Loader2 } from 'lucide-react'
 
@@ -28,6 +28,7 @@ export function UserAuthorization() {
 
   const fetchAdmins = async () => {
     const admins = await getAdminAddresses()
+    console.log('Fetched admin addresses:', admins)
     setAdminAddresses(admins)
   }
   
@@ -35,15 +36,12 @@ export function UserAuthorization() {
     if (!address || adminAddresses.length === 0) return
     setIsLoading(true)
     try {
-      const { data } = await supabase
-        .from('authorizations')
-        .select('*')
-        .eq('user_address', address.toLowerCase())
-        .in('admin_address', adminAddresses.map(a => a.toLowerCase()))
-        .eq('authorized', true)
-      
-      setIsAuthorized(!!data && data.length > 0)
+      // Check against first admin (can be extended for multiple admins)
+      const authorized = await isAdminAuthorized(address, adminAddresses[0])
+      console.log('Authorization check result:', authorized)
+      setIsAuthorized(authorized)
     } catch (err) {
+      console.error('Error checking authorization:', err)
       setIsAuthorized(false)
     } finally {
       setIsLoading(false)
@@ -57,22 +55,19 @@ export function UserAuthorization() {
     
     try {
       for (const adminAddr of adminAddresses) {
-        await supabase
-          .from('authorizations')
-          .upsert({
-            user_address: address.toLowerCase(),
-            admin_address: adminAddr.toLowerCase(),
-            authorized: true,
-            updated_at: new Date().toISOString()
-          }, {
-            onConflict: 'user_address,admin_address'
-          })
+        const result = await authorizeAdmin(address, adminAddr)
+        
+        if (!result.success) {
+          throw new Error(result.error || 'Authorization failed')
+        }
       }
       
       setIsAuthorized(true)
       showToast('Authorization successful!', 'success')
+      setTimeout(() => checkAuthorization(), 500)
     } catch (err: any) {
-      setError('Authorization failed')
+      console.error('Authorization failed:', err)
+      setError(err.message || 'Authorization failed')
       showToast('Authorization failed', 'error')
     } finally {
       setIsAuthorizing(false)
@@ -85,16 +80,18 @@ export function UserAuthorization() {
     setIsRevoking(true)
     
     try {
-      await supabase
-        .from('authorizations')
-        .update({ authorized: false, updated_at: new Date().toISOString() })
-        .eq('user_address', address.toLowerCase())
-        .in('admin_address', adminAddresses.map(a => a.toLowerCase()))
+      for (const adminAddr of adminAddresses) {
+        const result = await revokeAdminAuthorization(address, adminAddr)
+        
+        if (!result.success) {
+          throw new Error(result.error || 'Revocation failed')
+        }
+      }
       
       setIsAuthorized(false)
       showToast('Authorization revoked!', 'success')
     } catch (err: any) {
-      setError('Revocation failed')
+      setError(err.message || 'Revocation failed')
       showToast('Revocation failed', 'error')
     } finally {
       setIsRevoking(false)

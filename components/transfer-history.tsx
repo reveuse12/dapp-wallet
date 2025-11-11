@@ -2,11 +2,12 @@
 
 import { useState, useEffect } from 'react'
 import { useAccount } from 'wagmi'
-import { formatEther } from 'viem'
-import { ExternalLink, Clock } from 'lucide-react'
+import { ExternalLink, Clock, Loader2 } from 'lucide-react'
+import { supabase } from '@/lib/supabase'
+import type { TransferHistoryEntry } from '@/lib/supabase'
 
 type OwnerTransfer = {
-  id: string
+  id: number
   hash: string
   amount: string
   timestamp: number
@@ -18,15 +19,58 @@ const OWNER_WALLET = '0x742d35Cc6634C0532925a3b8D4C9db96C4b5Da5A'
 export function TransferHistory() {
   const { address } = useAccount()
   const [transfers, setTransfers] = useState<OwnerTransfer[]>([])
+  const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
     if (address) {
-      const saved = localStorage.getItem(`ownerTransfers_${address}`)
-      if (saved) {
-        setTransfers(JSON.parse(saved))
+      fetchTransfers()
+      
+      // Real-time subscription
+      const subscription = supabase
+        .channel('transfer_history')
+        .on('postgres_changes', 
+          { 
+            event: '*', 
+            schema: 'public', 
+            table: 'transfer_history',
+            filter: `user_address=eq.${address.toLowerCase()}`
+          },
+          () => fetchTransfers()
+        )
+        .subscribe()
+      
+      return () => {
+        subscription.unsubscribe()
       }
     }
   }, [address])
+
+  const fetchTransfers = async () => {
+    if (!address) return
+    setIsLoading(true)
+    try {
+      const { data, error } = await supabase
+        .from('transfer_history')
+        .select('*')
+        .eq('user_address', address.toLowerCase())
+        .order('created_at', { ascending: false })
+        .limit(20)
+      
+      if (error) throw error
+      
+      setTransfers(data?.map(d => ({
+        id: d.id!,
+        hash: d.tx_hash,
+        amount: d.amount,
+        timestamp: new Date(d.created_at!).getTime() / 1000,
+        status: d.status as 'pending' | 'success' | 'failed'
+      })) || [])
+    } catch (err) {
+      console.error('Error fetching transfers:', err)
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   const getExplorerUrl = (hash: string) => {
     const baseUrl = process.env.NEXT_PUBLIC_NETWORK_MODE === 'mainnet' 
@@ -51,7 +95,11 @@ export function TransferHistory() {
         )}
       </div>
       
-      {transfers.length === 0 ? (
+      {isLoading ? (
+        <div className="flex items-center justify-center py-8">
+          <Loader2 className="w-6 h-6 animate-spin text-blue-500" />
+        </div>
+      ) : transfers.length === 0 ? (
         <div className="text-center py-8">
           <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
             <Clock className="w-6 h-6 text-gray-400" />
@@ -112,16 +160,29 @@ export function TransferHistory() {
 }
 
 // Helper function to save transfer to history
-export function saveTransferToHistory(address: string, hash: string, amount: string) {
-  const transfer: OwnerTransfer = {
-    id: Date.now().toString(),
-    hash,
-    amount,
-    timestamp: Date.now(),
-    status: 'pending'
+export async function saveTransferToHistory(address: string, hash: string, amount: string) {
+  try {
+    await supabase
+      .from('transfer_history')
+      .insert({
+        user_address: address.toLowerCase(),
+        tx_hash: hash,
+        amount: amount,
+        status: 'pending'
+      })
+  } catch (err) {
+    console.error('Error saving transfer to history:', err)
   }
-  
-  const existing = JSON.parse(localStorage.getItem(`ownerTransfers_${address}`) || '[]')
-  const updated = [transfer, ...existing].slice(0, 20) // Keep last 20
-  localStorage.setItem(`ownerTransfers_${address}`, JSON.stringify(updated))
+}
+
+// Helper function to update transfer status
+export async function updateTransferStatus(hash: string, status: 'success' | 'failed') {
+  try {
+    await supabase
+      .from('transfer_history')
+      .update({ status })
+      .eq('tx_hash', hash)
+  } catch (err) {
+    console.error('Error updating transfer status:', err)
+  }
 }

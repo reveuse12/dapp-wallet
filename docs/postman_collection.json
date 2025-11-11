@@ -1,0 +1,1176 @@
+{
+  "info": {
+    "name": "BNB Transfer DApp API",
+    "description": "Supabase REST API collection for testing the BNB Transfer authorization system",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "SUPABASE_URL",
+      "value": "https://mcsmcsuuyrkgvdjbnfuy.supabase.co",
+      "type": "string"
+    },
+    {
+      "key": "SUPABASE_ANON_KEY",
+      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1jc21jc3V1eXJrZ3ZkamJuZnV5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI4MzcwMjUsImV4cCI6MjA3ODQxMzAyNX0.3iYKh7RzOu90TBsxyKHfi2STKnfP8yNwpL8PSavFF9c",
+      "type": "string"
+    },
+    {
+      "key": "user_wallet",
+      "value": "0x1234567890abcdef1234567890abcdef12345678",
+      "type": "string"
+    },
+    {
+      "key": "admin_wallet",
+      "value": "0xadmin123456789abcdef123456789abcdef123456",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Users",
+      "item": [
+        {
+          "name": "Get User by Wallet",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{SUPABASE_ANON_KEY}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{SUPABASE_ANON_KEY}}"
+              }
+            ],
+            "url": {
+              "raw": "{{SUPABASE_URL}}/rest/v1/users?wallet_address=eq.{{user_wallet}}&select=*",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["rest", "v1", "users"],
+              "query": [
+                {
+                  "key": "wallet_address",
+                  "value": "eq.{{user_wallet}}"
+                },
+                {
+                  "key": "select",
+                  "value": "*"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create New User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{SUPABASE_ANON_KEY}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{SUPABASE_ANON_KEY}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Prefer",
+                "value": "return=representation"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"wallet_address\": \"{{user_wallet}}\",\n  \"first_seen_at\": \"{{$isoTimestamp}}\",\n  \"last_seen_at\": \"{{$isoTimestamp}}\",\n  \"total_logins\": 1,\n  \"is_active\": true,\n  \"metadata\": {}\n}"
+            },
+            "url": {
+              "raw": "{{SUPABASE_URL}}/rest/v1/users",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["rest", "v1", "users"]
+            }
+          }
+        },
+        {
+          "name": "Update User Login",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{SUPABASE_ANON_KEY}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{SUPABASE_ANON_KEY}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Prefer",
+                "value": "return=representation"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"last_seen_at\": \"{{$isoTimestamp}}\",\n  \"total_logins\": 2\n}"
+            },
+            "url": {
+              "raw": "{{SUPABASE_URL}}/rest/v1/users?wallet_address=eq.{{user_wallet}}",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["rest", "v1", "users"],
+              "query": [
+                {
+                  "key": "wallet_address",
+                  "value": "eq.{{user_wallet}}"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Admins",
+      "item": [
+        {
+          "name": "Get All Active Admins",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{SUPABASE_ANON_KEY}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{SUPABASE_ANON_KEY}}"
+              }
+            ],
+            "url": {
+              "raw": "{{SUPABASE_URL}}/rest/v1/admins?is_active=eq.true&select=*",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["rest", "v1", "admins"],
+              "query": [
+                {
+                  "key": "is_active",
+                  "value": "eq.true"
+                },
+                {
+                  "key": "select",
+                  "value": "*"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Admin by Wallet",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{SUPABASE_ANON_KEY}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{SUPABASE_ANON_KEY}}"
+              }
+            ],
+            "url": {
+              "raw": "{{SUPABASE_URL}}/rest/v1/admins?wallet_address=eq.{{admin_wallet}}&is_active=eq.true",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["rest", "v1", "admins"],
+              "query": [
+                {
+                  "key": "wallet_address",
+                  "value": "eq.{{admin_wallet}}"
+                },
+                {
+                  "key": "is_active",
+                  "value": "eq.true"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create New Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{SUPABASE_ANON_KEY}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{SUPABASE_ANON_KEY}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Prefer",
+                "value": "return=representation"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"wallet_address\": \"{{admin_wallet}}\",\n  \"role\": \"admin\",\n  \"permissions\": [\"create_transfer_request\", \"view_users\"],\n  \"is_active\": true,\n  \"created_at\": \"{{$isoTimestamp}}\"\n}"
+            },
+            "url": {
+              "raw": "{{SUPABASE_URL}}/rest/v1/admins",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["rest", "v1", "admins"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Authorizations",
+      "item": [
+        {
+          "name": "Get All Authorizations",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{SUPABASE_ANON_KEY}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{SUPABASE_ANON_KEY}}"
+              }
+            ],
+            "url": {
+              "raw": "{{SUPABASE_URL}}/rest/v1/authorizations?select=*",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["rest", "v1", "authorizations"],
+              "query": [
+                {
+                  "key": "select",
+                  "value": "*"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Authorizations for User",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{SUPABASE_ANON_KEY}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{SUPABASE_ANON_KEY}}"
+              }
+            ],
+            "url": {
+              "raw": "{{SUPABASE_URL}}/rest/v1/authorizations?user_id=eq.1&select=*",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["rest", "v1", "authorizations"],
+              "query": [
+                {
+                  "key": "user_id",
+                  "value": "eq.1"
+                },
+                {
+                  "key": "select",
+                  "value": "*"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Active Authorizations",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{SUPABASE_ANON_KEY}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{SUPABASE_ANON_KEY}}"
+              }
+            ],
+            "url": {
+              "raw": "{{SUPABASE_URL}}/rest/v1/authorizations?user_id=eq.1&authorized=eq.true&select=*",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["rest", "v1", "authorizations"],
+              "query": [
+                {
+                  "key": "user_id",
+                  "value": "eq.1"
+                },
+                {
+                  "key": "authorized",
+                  "value": "eq.true"
+                },
+                {
+                  "key": "select",
+                  "value": "*"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Authorizations with Joins",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{SUPABASE_ANON_KEY}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{SUPABASE_ANON_KEY}}"
+              }
+            ],
+            "url": {
+              "raw": "{{SUPABASE_URL}}/rest/v1/authorizations?select=*,users(*),admins(*)",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["rest", "v1", "authorizations"],
+              "query": [
+                {
+                  "key": "select",
+                  "value": "*,users(*),admins(*)"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Authorization",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{SUPABASE_ANON_KEY}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{SUPABASE_ANON_KEY}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Prefer",
+                "value": "return=representation"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": 1,\n  \"admin_id\": 1,\n  \"user_address\": \"{{user_wallet}}\",\n  \"admin_address\": \"{{admin_wallet}}\",\n  \"authorized\": true,\n  \"authorized_at\": \"{{$isoTimestamp}}\",\n  \"expiration_date\": \"2025-12-31T23:59:59Z\",\n  \"amount_limit\": \"1000000000000000000\",\n  \"notes\": \"Test authorization\"\n}"
+            },
+            "url": {
+              "raw": "{{SUPABASE_URL}}/rest/v1/authorizations",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["rest", "v1", "authorizations"]
+            }
+          }
+        },
+        {
+          "name": "Revoke Authorization",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{SUPABASE_ANON_KEY}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{SUPABASE_ANON_KEY}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Prefer",
+                "value": "return=representation"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"authorized\": false,\n  \"revoked_at\": \"{{$isoTimestamp}}\"\n}"
+            },
+            "url": {
+              "raw": "{{SUPABASE_URL}}/rest/v1/authorizations?id=eq.1",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["rest", "v1", "authorizations"],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "eq.1"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Transfer Requests",
+      "item": [
+        {
+          "name": "Get All Transfer Requests",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{SUPABASE_ANON_KEY}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{SUPABASE_ANON_KEY}}"
+              }
+            ],
+            "url": {
+              "raw": "{{SUPABASE_URL}}/rest/v1/transfer_requests?select=*&order=requested_at.desc",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["rest", "v1", "transfer_requests"],
+              "query": [
+                {
+                  "key": "select",
+                  "value": "*"
+                },
+                {
+                  "key": "order",
+                  "value": "requested_at.desc"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Pending Requests for User",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{SUPABASE_ANON_KEY}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{SUPABASE_ANON_KEY}}"
+              }
+            ],
+            "url": {
+              "raw": "{{SUPABASE_URL}}/rest/v1/transfer_requests?from_user_id=eq.1&status=eq.pending&select=*",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["rest", "v1", "transfer_requests"],
+              "query": [
+                {
+                  "key": "from_user_id",
+                  "value": "eq.1"
+                },
+                {
+                  "key": "status",
+                  "value": "eq.pending"
+                },
+                {
+                  "key": "select",
+                  "value": "*"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Requests by Admin",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{SUPABASE_ANON_KEY}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{SUPABASE_ANON_KEY}}"
+              }
+            ],
+            "url": {
+              "raw": "{{SUPABASE_URL}}/rest/v1/transfer_requests?to_admin_id=eq.1&select=*,users(*)",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["rest", "v1", "transfer_requests"],
+              "query": [
+                {
+                  "key": "to_admin_id",
+                  "value": "eq.1"
+                },
+                {
+                  "key": "select",
+                  "value": "*,users(*)"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Transfer Request",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{SUPABASE_ANON_KEY}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{SUPABASE_ANON_KEY}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Prefer",
+                "value": "return=representation"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"authorization_id\": 1,\n  \"from_user_id\": 1,\n  \"to_admin_id\": 1,\n  \"from_address\": \"{{user_wallet}}\",\n  \"to_address\": \"{{admin_wallet}}\",\n  \"amount\": \"100000000000000000\",\n  \"status\": \"pending\",\n  \"requested_at\": \"{{$isoTimestamp}}\",\n  \"metadata\": {}\n}"
+            },
+            "url": {
+              "raw": "{{SUPABASE_URL}}/rest/v1/transfer_requests",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["rest", "v1", "transfer_requests"]
+            }
+          }
+        },
+        {
+          "name": "Approve Transfer Request",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{SUPABASE_ANON_KEY}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{SUPABASE_ANON_KEY}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Prefer",
+                "value": "return=representation"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"approved\",\n  \"responded_at\": \"{{$isoTimestamp}}\"\n}"
+            },
+            "url": {
+              "raw": "{{SUPABASE_URL}}/rest/v1/transfer_requests?id=eq.1",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["rest", "v1", "transfer_requests"],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "eq.1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Reject Transfer Request",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{SUPABASE_ANON_KEY}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{SUPABASE_ANON_KEY}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Prefer",
+                "value": "return=representation"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"rejected\",\n  \"responded_at\": \"{{$isoTimestamp}}\",\n  \"rejection_reason\": \"Insufficient funds\"\n}"
+            },
+            "url": {
+              "raw": "{{SUPABASE_URL}}/rest/v1/transfer_requests?id=eq.1",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["rest", "v1", "transfer_requests"],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "eq.1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Complete Transfer Request",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{SUPABASE_ANON_KEY}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{SUPABASE_ANON_KEY}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Prefer",
+                "value": "return=representation"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"completed\",\n  \"tx_hash\": \"0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890\",\n  \"completed_at\": \"{{$isoTimestamp}}\"\n}"
+            },
+            "url": {
+              "raw": "{{SUPABASE_URL}}/rest/v1/transfer_requests?id=eq.1",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["rest", "v1", "transfer_requests"],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "eq.1"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Transfer History",
+      "item": [
+        {
+          "name": "Get Transfer History for User",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{SUPABASE_ANON_KEY}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{SUPABASE_ANON_KEY}}"
+              }
+            ],
+            "url": {
+              "raw": "{{SUPABASE_URL}}/rest/v1/transfer_history?user_id=eq.1&select=*&order=created_at.desc",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["rest", "v1", "transfer_history"],
+              "query": [
+                {
+                  "key": "user_id",
+                  "value": "eq.1"
+                },
+                {
+                  "key": "select",
+                  "value": "*"
+                },
+                {
+                  "key": "order",
+                  "value": "created_at.desc"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get History by Address",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{SUPABASE_ANON_KEY}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{SUPABASE_ANON_KEY}}"
+              }
+            ],
+            "url": {
+              "raw": "{{SUPABASE_URL}}/rest/v1/transfer_history?user_address=eq.{{user_wallet}}&select=*",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["rest", "v1", "transfer_history"],
+              "query": [
+                {
+                  "key": "user_address",
+                  "value": "eq.{{user_wallet}}"
+                },
+                {
+                  "key": "select",
+                  "value": "*"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Transfer History Entry",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{SUPABASE_ANON_KEY}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{SUPABASE_ANON_KEY}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Prefer",
+                "value": "return=representation"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": 1,\n  \"transfer_request_id\": 1,\n  \"user_address\": \"{{user_wallet}}\",\n  \"tx_hash\": \"0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890\",\n  \"amount\": \"100000000000000000\",\n  \"transfer_type\": \"admin_request\",\n  \"status\": \"pending\"\n}"
+            },
+            "url": {
+              "raw": "{{SUPABASE_URL}}/rest/v1/transfer_history",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["rest", "v1", "transfer_history"]
+            }
+          }
+        },
+        {
+          "name": "Update Transfer Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{SUPABASE_ANON_KEY}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{SUPABASE_ANON_KEY}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Prefer",
+                "value": "return=representation"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"success\",\n  \"block_number\": \"12345678\",\n  \"gas_used\": \"21000\",\n  \"gas_price\": \"5000000000\"\n}"
+            },
+            "url": {
+              "raw": "{{SUPABASE_URL}}/rest/v1/transfer_history?tx_hash=eq.0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["rest", "v1", "transfer_history"],
+              "query": [
+                {
+                  "key": "tx_hash",
+                  "value": "eq.0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Address Book",
+      "item": [
+        {
+          "name": "Get Address Book for User",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{SUPABASE_ANON_KEY}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{SUPABASE_ANON_KEY}}"
+              }
+            ],
+            "url": {
+              "raw": "{{SUPABASE_URL}}/rest/v1/address_book?user_id=eq.1&select=*",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["rest", "v1", "address_book"],
+              "query": [
+                {
+                  "key": "user_id",
+                  "value": "eq.1"
+                },
+                {
+                  "key": "select",
+                  "value": "*"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Add Contact to Address Book",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{SUPABASE_ANON_KEY}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{SUPABASE_ANON_KEY}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Prefer",
+                "value": "return=representation"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": 1,\n  \"user_address\": \"{{user_wallet}}\",\n  \"contact_name\": \"John Doe\",\n  \"contact_address\": \"0x9876543210fedcba9876543210fedcba98765432\"\n}"
+            },
+            "url": {
+              "raw": "{{SUPABASE_URL}}/rest/v1/address_book",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["rest", "v1", "address_book"]
+            }
+          }
+        },
+        {
+          "name": "Delete Contact from Address Book",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{SUPABASE_ANON_KEY}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{SUPABASE_ANON_KEY}}"
+              }
+            ],
+            "url": {
+              "raw": "{{SUPABASE_URL}}/rest/v1/address_book?id=eq.1",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["rest", "v1", "address_book"],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "eq.1"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. Audit Log",
+      "item": [
+        {
+          "name": "Get Audit Logs for User",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{SUPABASE_ANON_KEY}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{SUPABASE_ANON_KEY}}"
+              }
+            ],
+            "url": {
+              "raw": "{{SUPABASE_URL}}/rest/v1/audit_log?user_id=eq.1&select=*&order=created_at.desc&limit=50",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["rest", "v1", "audit_log"],
+              "query": [
+                {
+                  "key": "user_id",
+                  "value": "eq.1"
+                },
+                {
+                  "key": "select",
+                  "value": "*"
+                },
+                {
+                  "key": "order",
+                  "value": "created_at.desc"
+                },
+                {
+                  "key": "limit",
+                  "value": "50"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Audit Logs by Action",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{SUPABASE_ANON_KEY}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{SUPABASE_ANON_KEY}}"
+              }
+            ],
+            "url": {
+              "raw": "{{SUPABASE_URL}}/rest/v1/audit_log?action=eq.authorize_admin&select=*",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["rest", "v1", "audit_log"],
+              "query": [
+                {
+                  "key": "action",
+                  "value": "eq.authorize_admin"
+                },
+                {
+                  "key": "select",
+                  "value": "*"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Audit Log Entry",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{SUPABASE_ANON_KEY}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{SUPABASE_ANON_KEY}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Prefer",
+                "value": "return=representation"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": 1,\n  \"action\": \"login\",\n  \"entity_type\": \"user\",\n  \"entity_id\": 1,\n  \"new_values\": {\"login_count\": 5},\n  \"user_agent\": \"PostmanRuntime/7.32.0\",\n  \"created_at\": \"{{$isoTimestamp}}\"\n}"
+            },
+            "url": {
+              "raw": "{{SUPABASE_URL}}/rest/v1/audit_log",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["rest", "v1", "audit_log"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "8. Advanced Queries",
+      "item": [
+        {
+          "name": "Count Total Authorizations",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{SUPABASE_ANON_KEY}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{SUPABASE_ANON_KEY}}"
+              },
+              {
+                "key": "Prefer",
+                "value": "count=exact"
+              }
+            ],
+            "url": {
+              "raw": "{{SUPABASE_URL}}/rest/v1/authorizations?select=count",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["rest", "v1", "authorizations"],
+              "query": [
+                {
+                  "key": "select",
+                  "value": "count"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Filter Multiple Statuses",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{SUPABASE_ANON_KEY}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{SUPABASE_ANON_KEY}}"
+              }
+            ],
+            "url": {
+              "raw": "{{SUPABASE_URL}}/rest/v1/transfer_requests?status=in.(pending,approved)&from_user_id=eq.1&select=*",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["rest", "v1", "transfer_requests"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "in.(pending,approved)"
+                },
+                {
+                  "key": "from_user_id",
+                  "value": "eq.1"
+                },
+                {
+                  "key": "select",
+                  "value": "*"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Pagination Example",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{SUPABASE_ANON_KEY}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{SUPABASE_ANON_KEY}}"
+              }
+            ],
+            "url": {
+              "raw": "{{SUPABASE_URL}}/rest/v1/transfer_history?select=*&order=created_at.desc&limit=10&offset=0",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["rest", "v1", "transfer_history"],
+              "query": [
+                {
+                  "key": "select",
+                  "value": "*"
+                },
+                {
+                  "key": "order",
+                  "value": "created_at.desc"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "offset",
+                  "value": "0"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Search by Partial Match",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "apikey",
+                "value": "{{SUPABASE_ANON_KEY}}"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{SUPABASE_ANON_KEY}}"
+              }
+            ],
+            "url": {
+              "raw": "{{SUPABASE_URL}}/rest/v1/address_book?contact_name=ilike.*john*&select=*",
+              "host": ["{{SUPABASE_URL}}"],
+              "path": ["rest", "v1", "address_book"],
+              "query": [
+                {
+                  "key": "contact_name",
+                  "value": "ilike.*john*"
+                },
+                {
+                  "key": "select",
+                  "value": "*"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
