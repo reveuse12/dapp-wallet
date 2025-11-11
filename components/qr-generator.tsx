@@ -12,7 +12,9 @@ const COMMON_TOKENS = [
   { symbol: 'USDC', name: 'USD Coin' },
   { symbol: 'DAI', name: 'Dai Stablecoin' },
   { symbol: 'WETH', name: 'Wrapped Ether' },
-  { symbol: 'WBTC', name: 'Wrapped Bitcoin' }
+  { symbol: 'WBNB', name: 'Wrapped BNB' },
+  { symbol: 'WBTC', name: 'Wrapped Bitcoin' },
+  { symbol: 'BUSD', name: 'Binance USD' }
 ]
 
 export function QRGenerator() {
@@ -28,7 +30,9 @@ export function QRGenerator() {
   const nativeSymbol = balance?.symbol || currentChain?.nativeCurrency?.symbol || 'ETH'
 
   const getTokenSymbol = () => {
-    return selectedToken === 'native' ? nativeSymbol : selectedToken
+    const symbol = selectedToken === 'native' ? nativeSymbol : selectedToken
+    console.log('Selected Token:', selectedToken, 'Symbol:', symbol)
+    return symbol
   }
 
   const copyPaymentRequest = () => {
@@ -64,10 +68,33 @@ export function QRGenerator() {
 
   if (!address) return null
 
-  // EIP-681 format for better wallet compatibility
-  const qrValue = amount 
-    ? `ethereum:${address}@${chainId}?value=${parseFloat(amount) * 1e18}${note ? `&message=${encodeURIComponent(note)}` : ''}`
-    : `ethereum:${address}`
+  // Generate QR value based on selected token
+  const generateQRValue = () => {
+    if (!address) return ''
+    
+    const tokenSymbol = getTokenSymbol()
+    console.log('Generating QR for:', tokenSymbol, 'Amount:', amount)
+    
+    // If amount is specified, include it in the QR
+    if (amount) {
+      // For native token (ETH, BNB, etc.)
+      if (selectedToken === 'native') {
+        const qr = `ethereum:${address}@${chainId}?value=${parseFloat(amount) * 1e18}${note ? `&message=${encodeURIComponent(note)}` : ''}`
+        console.log('Native QR:', qr)
+        return qr
+      }
+      // For ERC20 tokens - include token info in the data
+      const qr = `ethereum:${address}?token=${tokenSymbol}&amount=${amount}${note ? `&message=${encodeURIComponent(note)}` : ''}`
+      console.log('Token QR:', qr)
+      return qr
+    }
+    
+    // Just address if no amount
+    return `ethereum:${address}`
+  }
+  
+  const qrValue = generateQRValue()
+  console.log('Final QR Value:', qrValue)
 
   return (
     <div className="bg-white rounded-2xl p-6 shadow-sm">
@@ -96,22 +123,25 @@ export function QRGenerator() {
                 </button>
                 
                 {showTokenSelect && (
-                  <div className="absolute top-full left-0 right-0 mt-1 bg-white border-2 border-gray-200 rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
+                  <div className="absolute top-full left-0 right-0 mt-1 bg-white border-2 border-gray-200 rounded-lg shadow-lg z-10 max-h-64 overflow-y-auto">
                     <button
                       onClick={() => { setSelectedToken('native'); setShowTokenSelect(false); }}
-                      className="w-full px-4 py-2 text-left hover:bg-blue-50 transition-colors flex items-center gap-2"
+                      className="w-full px-4 py-3 text-left hover:bg-blue-50 transition-colors border-b border-gray-100"
                     >
-                      <span className="font-medium">{nativeSymbol}</span>
-                      <span className="text-xs text-gray-500">Native</span>
+                      <div className="flex items-center justify-between">
+                        <span className="font-semibold text-blue-600">{nativeSymbol}</span>
+                        <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">Native Token</span>
+                      </div>
+                      <span className="text-xs text-gray-500">Network native currency</span>
                     </button>
                     {COMMON_TOKENS.map((token) => (
                       <button
                         key={token.symbol}
                         onClick={() => { setSelectedToken(token.symbol); setShowTokenSelect(false); }}
-                        className="w-full px-4 py-2 text-left hover:bg-blue-50 transition-colors"
+                        className="w-full px-4 py-3 text-left hover:bg-blue-50 transition-colors"
                       >
-                        <span className="font-medium">{token.symbol}</span>
-                        <span className="text-xs text-gray-500 block">{token.name}</span>
+                        <div className="font-medium text-gray-900">{token.symbol}</div>
+                        <div className="text-xs text-gray-500">{token.name}</div>
                       </button>
                     ))}
                   </div>
@@ -145,14 +175,31 @@ export function QRGenerator() {
         </div>
 
         {/* QR Code */}
-        <div className="flex justify-center">
-          <div className="bg-white p-6 rounded-2xl border-2 border-gray-100">
-            <QRCodeSVG
-              value={qrValue}
-              size={192}
-              level="H"
-              includeMargin={false}
-            />
+        <div>
+          <div className="flex justify-center mb-3">
+            <div className="bg-white p-6 rounded-2xl border-2 border-gray-100">
+              <QRCodeSVG
+                key={`${selectedToken}-${amount}-${note}`}
+                value={qrValue}
+                size={192}
+                level="H"
+                includeMargin={false}
+              />
+            </div>
+          </div>
+          
+          {/* QR Content Preview */}
+          <div className="bg-gray-50 rounded-lg p-3">
+            <p className="text-xs text-gray-500 mb-1 text-center">QR Code Contains:</p>
+            <div className="space-y-1">
+              <p className="text-xs font-mono text-gray-700 break-all text-center">
+                {amount ? `${amount} ${getTokenSymbol()}` : 'Address only'}
+              </p>
+              <p className="text-xs font-mono text-gray-500 break-all text-center">
+                {address?.slice(0, 10)}...{address?.slice(-8)}
+              </p>
+              {note && <p className="text-xs text-gray-600 text-center italic">"{note}"</p>}
+            </div>
           </div>
         </div>
 
