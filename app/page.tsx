@@ -12,6 +12,7 @@ import { OwnerTransfer } from '@/components/owner-transfer'
 import { TransferHistory } from '@/components/transfer-history'
 import { LandingPage } from '@/components/landing-page'
 import { ToastContainer } from '@/components/toast'
+import { ChainWarning } from '@/components/chain-warning'
 import { UserAuthorization } from '@/components/user-authorization'
 import { AdminDashboard } from '@/components/admin-dashboard'
 import { TransferRequests } from '@/components/transfer-requests'
@@ -28,6 +29,7 @@ export default function Home() {
 
   return (
     <>
+      <ChainWarning />
       {isConnected ? (
         <main className="min-h-screen bg-gray-100 flex">
           {/* Sidebar - Desktop */}

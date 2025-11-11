@@ -1,15 +1,17 @@
 import { getDefaultConfig } from '@rainbow-me/rainbowkit'
 import { getChains } from './chains'
+import { http } from 'viem'
 
 export const config = getDefaultConfig({
   appName: 'Multi-Chain Transfer Dapp',
   projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || '',
   chains: getChains() as any,
   ssr: true,
-  // Fallback to injected wallets if no project ID
-  ...((!process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID === '') && {
-    wallets: []
-  })
+  multiInjectedProviderDiscovery: true,
+  transports: getChains().reduce((acc: any, chain: any) => {
+    acc[chain.id] = http()
+    return acc
+  }, {})
 })
 
 // Admin address for the authorization system
